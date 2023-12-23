@@ -1,0 +1,43 @@
+﻿@model UserModel
+@{
+    ViewData["Title"] = "Профиль";
+    if (Model.Role?.Name!.ToLower() == "admin") Layout = "_AdminLayout";
+}
+
+<style>
+    label {
+        width: 200px;
+    }
+</style>
+
+<h1>@(Model.Name is null ? "Добро пожаловать" : Model.Name)</h1>
+<form class="form-control" asp-controller="User" asp-action="Edit" method="post">
+    <label for="name">Имя:</label>
+    <input type="text" id="name" name="name" value="@(Model.Name is null ? "Не указано" : Model.Name)" readonly>
+    <br />
+    <label for="address">Адрес:</label>
+    <input type="text" id="address" name="address" value="@(Model.Address is null ? "Не указан" : Model.Address)" readonly>
+    <br />
+    <label for="phone">Телефон:</label>
+    <input type="tel" id="phone" name="phone" value="@(Model.Phone is null ? "Не указан" : Model.Phone)" readonly>
+    <br />
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" value="@(Model.Email is null ? "Не указан" : Model.Email)" readonly>
+    <br />
+    <label>Роль: @(Model.Role is null ? "Не указана" : Model.Role.Name)</label>
+    <br />
+    <button type="button" id="editButton">Редактировать</button>
+    <button type="submit" id="saveButton" style="display: none;">Сохранить</button>
+</form>
+
+<a class="navbar-brand" asp-area="" asp-controller="User" asp-action="Logout">Выход</a>
+
+<script>
+    document.getElementById('editButton').addEventListener('click', function() {
+        document.querySelectorAll('input').forEach(function(element) {
+            element.removeAttribute('readonly');
+        });
+        document.getElementById('editButton').style.display = 'none';
+        document.getElementById('saveButton').style.display = 'inline-block';
+    });
+</script>

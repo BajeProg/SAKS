@@ -1,0 +1,27 @@
+﻿@model object
+@{
+    ViewData["Title"] = "Register";
+}
+<style>
+    label {
+        width: 150px;
+    }
+</style>
+<h1>Регистрация</h1>
+@if (Model is string)
+{
+    <h3 style="color: red;">@Model</h3>
+}
+<form class="form-control" method="post">
+    <label for="phone">Телефон:</label>
+    <input type="tel" id="phone" name="phone" required>
+    <br><br>
+    <label for="password">Пароль:</label>
+    <input type="password" id="password" name="password" required>
+    <br><br>
+    <label for="confirm_password">Повторите пароль:</label>
+    <input type="password" id="confirm_password" name="confirm_password" required>
+    <br><br>
+    <input type="submit" value="Зарегистрироваться">
+</form>
+<p>Уже есть аккаунт? <a asp-area="" asp-controller="Authorization" asp-action="Index">Войти</a></p>

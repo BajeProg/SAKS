@@ -1,0 +1,129 @@
+﻿@model IEnumerable<UserModel>
+@{
+    Layout = "_AdminLayout";
+}
+
+<style>
+    table {
+        width: 500px;
+        border-collapse: collapse;
+        border: 1px solid;
+    }
+
+    td {
+        padding: 3px;
+        border: 1px solid;
+        text-align: left;
+    }
+</style>
+
+<h1>Список пользователей</h1>
+
+<!-- Поиск пользователей -->
+<label for="search">Поиск по имени:</label>
+<input type="text" id="search" name="search" placeholder="Введите имя">
+<button onclick="searchUsers()">Найти</button>
+
+<form asp-action="GetReport">
+    <button type="submit">Скачать</button>
+</form>
+
+<!-- Таблица пользователей -->
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Имя</th>
+            <th>Адрес</th>
+            <th>Телефон</th>
+            <th>Email</th>
+            <th>Роль</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Здесь будут отображаться пользователи -->
+    </tbody>
+</table>
+
+<script>
+    // Пример данных (можете заменить своими данными)
+    var users = [
+        @foreach(var user in Model){
+        WriteLiteral('{' + $" id: {user.Id}, name: '{user.Name}', address: '{user.Address}', phone: '{user.Phone}', email: '{user.Email}', role: '{user.Role?.Name}' " + " },");
+    }
+    ];
+
+    // Функция для отображения пользователей в таблице
+    function displayUsers(filteredUsers) {
+        var tableBody = document.querySelector('tbody');
+        tableBody.innerHTML = '';
+
+        filteredUsers.forEach(function (user) {
+            var row = document.createElement('tr');
+            row.innerHTML = `
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.address}</td>
+                        <td>${user.phone}</td>
+                        <td>${user.email}</td>
+                        <td id="roleCell${user.id}">${user.role}</td>
+                    <td>
+                        <button onclick="editRole(${user.id})">Редактировать</button>
+                        <form method="post" action="/User/Remove/${user.id}"><button type="submit">Удалить</button></form>
+                    </td>
+                `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    // Функция для редактирования роли
+    function editRole(userId) {
+        var roleCell = document.getElementById(`roleCell${userId}`);
+        var currentRole = roleCell.textContent;
+
+        // Заменить текст ячейки на форму с выпадающим списком и кнопкой "Сохранить"
+        roleCell.innerHTML = `
+            <form method="post" action="/User/EditRole">
+                <select id="roleSelect${userId}" name="roleId">
+                @foreach(var item in await RoleModel.GetAsync()){
+                    <option value="@item.Id">@item.Name</option>
+                }
+                </select>
+                        <input type="hidden" name="userId" value="${userId}">
+                    <button type="submit">Сохранить</button>
+                    </form>
+            `;
+
+        // Установить текущую роль в списке выбора
+        var roleSelect = document.getElementById(`roleSelect${userId}`);
+        roleSelect.value = currentRole;
+    }
+
+    // Функция для сохранения измененной роли
+    function saveRole(userId) {
+        var roleSelect = document.getElementById(`roleSelect${userId}`);
+        var newRole = roleSelect.value;
+
+        // Здесь вы можете реализовать логику сохранения новой роли (например, отправка на сервер)
+
+        // После сохранения обновить ячейку с ролью
+        var roleCell = document.getElementById(`roleCell${userId}`);
+        roleCell.textContent = newRole;
+    }
+
+    // Функция для поиска пользователей
+    function searchUsers() {
+        var searchInput = document.getElementById('search');
+        var searchTerm = searchInput.value.toLowerCase();
+
+        var filteredUsers = users.filter(function (user) {
+            return user.name.toLowerCase().includes(searchTerm);
+        });
+
+        displayUsers(filteredUsers);
+    }
+
+    // Начальное отображение всех пользователей
+    displayUsers(users);
+</script>

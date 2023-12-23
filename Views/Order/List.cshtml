@@ -1,0 +1,9 @@
+﻿@model List<OrderModel>
+@{
+}
+<ul>
+    @foreach(var order in Model)
+    {
+        <li><a asp-controller="Order" asp-action="Index" asp-route-id="@order.Id">Заказ №@order.Id - @order.Price руб. </a> <br /> Куда: @order.Address (@order.Receiver)</li>
+    }
+</ul>

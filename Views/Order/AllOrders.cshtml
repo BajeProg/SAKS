@@ -1,0 +1,99 @@
+﻿@model IEnumerable<OrderModel>
+@{
+    Layout = "_AdminLayout";
+}
+
+<style>
+    table {
+        width: 500px;
+        border-collapse: collapse;
+        border: 1px solid;
+    }
+
+    td {
+        padding: 3px;
+        border: 1px solid;
+        text-align: left;
+    }
+</style>
+
+<h1>Список заказов</h1>
+
+<!-- Поиск заказов -->
+<label for="search">Поиск по получателю:</label>
+<input type="text" id="search" name="search" placeholder="Введите имя получателя">
+<button onclick="searchOrders()">Найти</button>
+
+<form asp-action="GetReport">
+    <button type="submit">Скачать</button>
+</form>
+
+<!-- Таблица заказов -->
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Цена</th>
+            <th>Вес</th>
+            <th>Высота</th>
+            <th>Ширина</th>
+            <th>Длина</th>
+            <th>Получатель</th>
+            <th>Адрес доставки</th>
+            <th>Отправитель</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Здесь будут отображаться заказы -->
+    </tbody>
+</table>
+
+<script>
+    // Пример данных (можете заменить своими данными)
+    var orders = [
+        @foreach(var item in Model){
+        WriteLiteral('{' + $"id: {item.Id},price: {item.Price.ToString().Replace(',', '.')},weight: {item.Weight.ToString().Replace(',', '.')},height: {item.Height},width: {item.Width},length: {item.Length},receiver: '{item.Receiver}',address: '{item.Address}', sender:" + '{' + $"id: {item.Sender?.Id}, name: '{item.Sender?.Name}'" + '}' + "},");
+    }
+        
+    ];
+
+    // Функция для отображения заказов в таблице
+    function displayOrders(filteredOrders) {
+        var tableBody = document.querySelector('tbody');
+        tableBody.innerHTML = '';
+
+        filteredOrders.forEach(function (order) {
+            var row = document.createElement('tr');
+            row.innerHTML = `
+                                <td><a href="/Order/Index/${order.id}">${order.id}</a></td>
+                        <td>${order.price.toFixed(2)}</td>
+                        <td>${order.weight}</td>
+                        <td>${order.height}</td>
+                        <td>${order.width}</td>
+                        <td>${order.length}</td>
+                        <td>${order.receiver}</td>
+                        <td>${order.address}</td>
+                        <td>${order.sender.name}</td>
+                            <td><form method="post" action="/Order/Remove/${order.id}"><button type="submit">Удалить</button></form></td>
+                    `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    // Функция для поиска заказов
+    function searchOrders() {
+        var searchInput = document.getElementById('search');
+        var searchTerm = searchInput.value.toLowerCase();
+
+        var filteredOrders = orders.filter(function (order) {
+            return order.receiver.toLowerCase().includes(searchTerm);
+        });
+
+        displayOrders(filteredOrders);
+    }
+
+
+    // Начальное отображение всех заказов
+    displayOrders(orders);
+</script>

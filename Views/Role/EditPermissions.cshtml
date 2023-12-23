@@ -1,0 +1,20 @@
+﻿@model SAKS.Controllers.EditPermissionsViewModel
+
+<h2>Edit Permissions for @Model.Role.Name</h2>
+
+<form asp-action="SaveRolePermissions" asp-controller="Role" method="post">
+    <input type="hidden" asp-for="Role.Id" />
+    <input type="hidden" asp-for="Role.Name" />
+    <input type="hidden" asp-for="Permissions" />
+    <input type="hidden" asp-for="SelectedPermissions" />
+    <h3>Permissions:</h3>
+    @foreach (var permission in Model.Permissions)
+    {
+        <label>
+            <input type="checkbox" name="SelectedPermissions" value="@permission.Name" @(Model.SelectedPermissions.Contains(permission.Name) ? "checked" : "")>
+            @permission.Name
+        </label>
+    }
+
+    <button type="submit">Save</button>
+</form>

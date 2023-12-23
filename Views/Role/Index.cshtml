@@ -1,0 +1,39 @@
+﻿@model RoleService.Role[]
+@{
+    Layout = "_AdminLayout";
+}
+<h1>Roles</h1>
+
+<!-- Кнопка "Добавить" для отображения формы добавления роли -->
+<button onclick="toggleAddForm()">Добавить</button>
+
+<!-- Форма добавления роли (по умолчанию скрыта) -->
+<form id="addRoleForm" style="display: none;" asp-action="Add" asp-controller="Role" method="post">
+    <label for="roleName">Новая роль:</label>
+    <input type="text" id="roleName" name="roleName" required>
+    <button type="submit">Добавить</button>
+</form>
+
+<!-- Список ролей -->
+<ul>
+    @foreach (var role in Model)
+    {
+        <li>
+            @role.Name
+            <!-- Кнопка для удаления роли -->
+            <form asp-action="Remove" asp-controller="Role" asp-route-id="@role.Id" method="post"><button type="submit">Удалить</button></form>
+
+            <!-- Кнопка "Редактировать" для отображения формы редактирования разрешений -->
+            <form asp-action="EditPermissions" asp-controller="Role" asp-route-id="@role.Id"><button type="submit">Редактировать</button></form>
+
+        </li>
+    }
+</ul>
+
+<script>
+    function toggleAddForm() {
+        var addForm = document.getElementById('addRoleForm');
+        addForm.style.display = addForm.style.display === 'none' ? 'block' : 'none';
+    }
+
+</script>

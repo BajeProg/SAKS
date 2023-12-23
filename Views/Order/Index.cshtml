@@ -1,0 +1,69 @@
+﻿@model Tuple<OrderModel, UserModel>
+@{
+    ViewData["Title"] = $"Заказ {Model.Item1.Id}";
+}
+<style>
+    li{
+        list-style-type: none;
+    }
+
+    table {
+        width: 500px;
+        border-collapse: collapse;
+        border: 1px solid;
+    }
+
+    td {
+        padding: 3px;
+        border: 1px solid;
+        text-align: left;
+    }
+</style>
+<h1>Информация о заказе</h1>
+
+<h2>Данные заказа</h2>
+<ul>
+    <li><strong>Вес:</strong> @Model.Item1.Weight кг</li>
+    <li><strong>Высота:</strong> @Model.Item1.Height см</li>
+    <li><strong>Ширина:</strong> @Model.Item1.Width см</li>
+    <li><strong>Длина:</strong> @Model.Item1.Length см</li>
+    <li><strong>Получатель:</strong> @Model.Item1.Receiver</li>
+    <li><strong>Адрес доставки:</strong> @Model.Item1.Address</li>
+</ul>
+@if(Model.Item2 != null && (await Model.Item2.Role?.GetPermissionsAsync()!).FirstOrDefault(x => x.Name!.ToLower() == "управление заказами") is not null)
+{
+    <form id="addActionForm" asp-controller="Order" asp-action="AddAction" method="post">
+        <label for="courier">Курьер:</label>
+        <select id="courier" name="courier" required>
+            @foreach(var item in await UserModel.GetAsync())
+            {
+                <option value="@item.Id">@item.Name</option>
+            }
+        </select>
+
+        <label for="status">Статус:</label>
+        <input type="text" id="status" name="status" required>
+        <input type="hidden" name="order" value="@Model.Item1.Id">
+
+        <button type="submit" >Добавить действие</button>
+    </form>
+}
+<h2>История изменений</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Курьер</th>
+            <th>Дата</th>
+            <th>Статус</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var item in (await DeliveryModel.GetAsync()).Where(x => x.Order?.Id == Model.Item1.Id)){
+        <tr>
+            <td>@(item.Courier is null ? "" : item.Courier?.Name)</td>
+            <td>@item.Date.ToShortDateString()</td>
+            <td>@item.Status</td>
+        </tr>
+        }
+    </tbody>
+</table>
